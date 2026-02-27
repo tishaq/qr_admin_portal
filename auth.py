@@ -3,7 +3,7 @@ from jose import jwt
 import os
 from datetime import datetime, timedelta
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "supersecret")
+SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGE_ME_SECRET")
 ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create Ticket</h2>
+<div class="card p-4 mt-3">
+<form method="post" action="/tickets/create">
+<input name="name" class="form-control mb-3" placeholder="Full Name">
+<select name="level" class="form-control mb-3">
+<option>GlassHouse</option>
+<option>VIP</option>
+<option>Security</option>
+<option>Media</option>
+</select>
+<input type="number" name="duration" class="form-control mb-3" value="120">
+<button class="btn btn-gold">Generate</button>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Event Dashboard</h2>
+<div class="card p-3 mt-3">
+<table class="table table-hover mt-3">
+<thead>
+<tr><th>Name</th><th>Level</th><th>Status</th><th>Issued</th><th>Action</th></tr>
+</thead>
+<tbody>
+{% for t in tickets %}
+<tr>
+<td>{{ t.name }}</td>
+<td>{{ t.level }}</td>
+<td>{{ t.status }}</td>
+<td>{{ t.issued_at }}</td>
+<td><a href="/tickets/{{ t.ticket_id }}" class="btn btn-sm btn-outline-light">View</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

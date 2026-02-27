@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Ticket Detail</h2>
+<div class="card p-4 mt-3">
+<p><strong>Name:</strong> {{ ticket.name }}</p>
+<p><strong>Level:</strong> {{ ticket.level }}</p>
+<p><strong>Status:</strong> {{ ticket.status }}</p>
+<p><strong>Issued:</strong> {{ ticket.issued_at }}</p>
+<p><strong>Duration:</strong> {{ ticket.duration_minutes }} minutes</p>
+<form method="post" action="/tickets/{{ ticket.ticket_id }}/disable">
+<button class="btn btn-danger">Disable</button>
+</form>
+</div>
+{% endblock %}

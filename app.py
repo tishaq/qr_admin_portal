@@ -1,23 +1,20 @@
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-import uuid
+from boto3.dynamodb.conditions import Key
 from datetime import datetime
+import uuid
+
 from auth import hash_password, verify_password, create_token
 from db import admins_table, tickets_table
-from boto3.dynamodb.conditions import Key
 
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-# ========================
-# Login Page
-# ========================
 @app.get("/", response_class=HTMLResponse)
 def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
@@ -39,9 +36,6 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     return response
 
 
-# ========================
-# Dashboard
-# ========================
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard(request: Request):
     scan = tickets_table.scan()
@@ -52,9 +46,6 @@ def dashboard(request: Request):
     })
 
 
-# ========================
-# Create Ticket
-# ========================
 @app.get("/tickets/new", response_class=HTMLResponse)
 def new_ticket_page(request: Request):
     return templates.TemplateResponse("create_ticket.html", {"request": request})
@@ -74,5 +65,26 @@ def create_ticket(name: str = Form(...), level: str = Form(...), duration: int =
     }
 
     tickets_table.put_item(Item=item)
+    return RedirectResponse("/dashboard", status_code=302)
 
+
+@app.get("/tickets/{ticket_id}", response_class=HTMLResponse)
+def ticket_detail(request: Request, ticket_id: str):
+    res = tickets_table.get_item(Key={"ticket_id": ticket_id})
+    ticket = res.get("Item")
+
+    return templates.TemplateResponse("ticket_detail.html", {
+        "request": request,
+        "ticket": ticket
+    })
+
+
+@app.post("/tickets/{ticket_id}/disable")
+def disable_ticket(ticket_id: str):
+    tickets_table.update_item(
+        Key={"ticket_id": ticket_id},
+        UpdateExpression="SET #s = :val",
+        ExpressionAttributeNames={"#s": "status"},
+        ExpressionAttributeValues={":val": "disabled"}
+    )
     return RedirectResponse("/dashboard", status_code=302)
