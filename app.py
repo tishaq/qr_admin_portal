@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from boto3.dynamodb.conditions import Key
 from datetime import datetime
 import uuid
-
+import os
 from auth import hash_password, verify_password, create_token
 from db import admins_table, tickets_table
 
@@ -22,6 +22,13 @@ def login_page(request: Request):
 
 @app.post("/login")
 def login(request: Request, username: str = Form(...), password: str = Form(...)):
+
+    if os.environ.get("MAINTENANCE_MODE") == "true":
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "System temporarily suspended by administrator."
+        })
+
     res = admins_table.get_item(Key={"username": username})
     user = res.get("Item")
 
